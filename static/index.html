@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT Mini Studio</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Modals => Full Page Auth Screen -->
+    <div id="authModal" class="modal-backdrop">
+        <div class="auth-header">
+            <div class="auth-logo-box">🤖</div>
+            <h1>GPT Mini Studio</h1>
+            <p>Your AI-powered assistant</p>
+        </div>
+        <div class="modal">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tabLogin" onclick="switchAuthMode('login')">Log in</div>
+                <div class="auth-tab" id="tabSignup" onclick="switchAuthMode('signup')">Sign up</div>
+            </div>
+
+            <div class="auth-content">
+                <div class="auth-group signup-field" style="display: none;">
+                    <label for="firstNameInput">First Name <span style="color:red">*</span></label>
+                    <input type="text" id="firstNameInput" placeholder="e.g. Omkar" class="auth-input">
+                </div>
+                <div class="auth-group signup-field" style="display: none;">
+                    <label for="lastNameInput">Last Name <span style="color:red">*</span></label>
+                    <input type="text" id="lastNameInput" placeholder="e.g. Gutal" class="auth-input">
+                </div>
+                <div class="auth-group">
+                    <label for="emailInput">Email <span style="color:red">*</span></label>
+                    <input type="email" id="emailInput" placeholder="user@example.com" class="auth-input">
+                </div>
+                <div class="auth-group">
+                    <label for="pinInput">Password <span style="color:red">*</span></label>
+                    <input type="password" id="pinInput" placeholder="••••••••" class="auth-input">
+                </div>
+                <div class="auth-group signup-field" style="display: none;">
+                    <label for="mobileInput">Mobile (Optional)</label>
+                    <input type="tel" id="mobileInput" placeholder="+91 0000000000" class="auth-input">
+                </div>
+                <button class="continue-btn" id="emailAuthBtn" onclick="handleEmailAuth()">Log in</button>
+
+                <div class="divider"><span>OR</span></div>
+
+                <div class="social-auth-btns">
+                    <button class="auth-btn" onclick="location.href='/api/auth/login/google'"><i
+                            class="fa-brands fa-google"></i> Continue with Google</button>
+                    <button class="auth-btn" onclick="location.href='/api/auth/login/github'"><i
+                            class="fa-brands fa-github"></i> Continue with GitHub</button>
+                    <button class="auth-btn" onclick="location.href='/api/auth/login/linkedin'"><i
+                            class="fa-brands fa-linkedin"></i> Continue with LinkedIn</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer-text">
+            By continuing, you agree to our Terms of Service and Privacy Policy
+        </div>
+    </div>
+
+    <div class="layout-wrapper" id="appLayout">
+        <!-- Sidebar layout like ChatGPT -->
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-nav">
+                <div class="nav-item" onclick="startNewChat()" title="New Chat">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                    <span>New Chat</span>
+                </div>
+                <div class="nav-item" onclick="toggleSearch()" title="Search Chats">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Search</span>
+                </div>
+                <!-- Search Box (Hidden by default) -->
+                <div id="searchContainer" class="search-container hidden">
+                    <input type="text" id="sidebarSearchInput" placeholder="Search keywords..."
+                        oninput="handleSearch(this.value)">
+                    <i class="fa-solid fa-xmark" onclick="toggleSearch()"></i>
+                </div>
+            </div>
+
+            <button class="new-chat-btn" onclick="startNewChat()" style="display:none;">
+                <i class="fa-solid fa-plus"></i>
+                <span>New Chat</span>
+            </button>
+            <div class="chat-history" id="chatHistoryList">
+                <div class="history-group"><i class="fa-solid fa-clock-rotate-left"></i> CHAT HISTORY</div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div id="userProfile" class="user-profile hidden" onclick="toggleProfileMenu(event)"
+                    title="Account settings">
+                    <div class="user-avatar">U</div>
+                    <div class="user-info">
+                        <div class="user-email" id="displayEmail">user@example.com</div>
+                        <div class="user-credits">Credits: <span id="displayCredits">50</span></div>
+                    </div>
+                    <i class="fa-solid fa-chevron-up"></i>
+
+                    <!-- Profile Dropdown Menu -->
+                    <div id="profileMenu" class="profile-dropdown-menu">
+                        <div class="dropdown-header">
+                            <div class="user-avatar small">U</div>
+                            <div class="dropdown-user-detail">
+                                <div class="dropdown-name" id="dropdownUserName">User Name</div>
+                                <div class="dropdown-email" id="dropdownUserEmail">user@example.com</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" onclick="openUpgradeModal()">
+                            <i class="fa-solid fa-sparkles"></i> Upgrade plan
+                        </div>
+                        <div class="dropdown-item" onclick="openSettingsModal()">
+                            <i class="fa-solid fa-gear"></i> Settings
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" onclick="openHelpModal()">
+                            <i class="fa-solid fa-circle-question"></i> Help
+                            <i class="fa-solid fa-chevron-right" style="margin-left:auto; font-size:10px;"></i>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <i class="fa-solid fa-right-from-bracket"></i> Log out
+                        </div>
+                    </div>
+                </div>
+                <div id="sidebarLoginPrompt" class="sidebar-login-prompt">
+                    <button class="sidebar-login-btn" onclick="openModal('login')">Log in to save history</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Chat Context Menu Shell -->
+        <div id="chatContextMenu" class="chat-context-menu">
+            <div class="context-item" onclick="shareChat()"><i class="fa-solid fa-share-nodes"></i> Share</div>
+            <div class="context-item" onclick="renameChatPrompt()"><i class="fa-solid fa-pen"></i> Rename</div>
+            <div class="context-item" onclick="pinChat()"><i class="fa-solid fa-thumbtack"></i> Pin chat</div>
+            <div class="dropdown-divider"></div>
+            <div class="context-item delete" onclick="deleteChat()"><i class="fa-solid fa-trash"></i> Delete</div>
+        </div>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="btn-secondary" id="sidebarToggle" onclick="toggleSidebar()"
+                        style="padding: 0; margin-right: 8px;"><i class="fa-solid fa-star"
+                            style="color: var(--primary);"></i></button>
+                    <h2><i class="fa-solid fa-sparkles"></i> GPT Mini Studio</h2>
+                </div>
+                <div class="header-right">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Model Ready</span>
+                    </div>
+                    <div class="auth-buttons" id="headerAuthButtons">
+                        <button class="btn-primary" onclick="openModal('login')">Log in / Sign up</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message system-message fade-in-up">
+                        <div class="message-avatar">
+                            🤖
+                        </div>
+                        <div class="message-bubble system">Hello! I am GPT Mini. I'm ready for inference. What would you
+                            like me to generate today?</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parameters Panel removed for a cleaner chat interface -->
+            <div style="display: none;">
+                <input type="range" id="maxTokens" min="1" max="1000" value="1000" class="slider">
+                <input type="range" id="temperature" min="0.1" max="2.0" step="0.1" value="0.7" class="slider">
+                <input type="range" id="topK" min="1" max="100" value="50" class="slider">
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea id="promptInput" placeholder="Message GPT Mini..." rows="1"></textarea>
+                    <button id="sendBtn" class="send-btn" disabled>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="footer-text">
+                    GPT Mini can make mistakes. Verify important info.
+                    <div class="social-links"
+                        style="margin-top: 10px; display: flex; gap: 15px; justify-content: center;">
+                        <a href="https://linkedin.com/in/omkar-gutal-a25935249" target="_blank"><i
+                                class="fa-brands fa-linkedin"></i></a>
+                        <a href="https://github.com/omkargutal" target="_blank"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://youtube.com/@buildwithomkarg" target="_blank"><i
+                                class="fa-brands fa-youtube"></i></a>
+                        <a href="https://x.com/job_update_2k25" target="_blank"><i
+                                class="fa-brands fa-x-twitter"></i></a>
+                    </div>
+                    <div style="margin-top: 5px; font-weight: 500;">© 2026 Omkar Gutal. All Rights Reserved.</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Upgrade Plan Modal -->
+    <div id="upgradeModal" class="modal-backdrop">
+        <div class="modal large-modal">
+            <div class="modal-header-nav">
+                <h2>Upgrade your plan</h2>
+                <button class="close-modal-btn" onclick="closeUpgradeModal()">&times;</button>
+            </div>
+            <div class="plan-toggle">
+                <button class="toggle-btn active">Personal</button>
+                <button class="toggle-btn">Business</button>
+            </div>
+            <div class="pricing-grid">
+                <div class="plan-card">
+                    <h3>Free</h3>
+                    <div class="price">₹ 0 <span>/ month</span></div>
+                    <p>See what AI can do</p>
+                    <button class="plan-btn disabled">Your current plan</button>
+                    <ul class="plan-features">
+                        <li><i class="fa-solid fa-sparkles"></i> Get simple explanations</li>
+                        <li><i class="fa-solid fa-comment"></i> Have short chats</li>
+                        <li><i class="fa-solid fa-image"></i> Try out basic generation</li>
+                    </ul>
+                </div>
+                <div class="plan-card highlighted">
+                    <div class="badge">POPULAR</div>
+                    <h3>Plus</h3>
+                    <div class="price">₹ 1,999 <span>/ month</span></div>
+                    <p>Unlock the full experience</p>
+                    <button class="plan-btn primary">Upgrade to Plus</button>
+                    <ul class="plan-features">
+                        <li><i class="fa-solid fa-brain"></i> Solve complex problems</li>
+                        <li><i class="fa-solid fa-clock-rotate-left"></i> Long chat history</li>
+                        <li><i class="fa-solid fa-bolt"></i> Faster generation speed</li>
+                    </ul>
+                </div>
+                <div class="plan-card">
+                    <h3>Pro</h3>
+                    <div class="price">₹ 19,900 <span>/ month</span></div>
+                    <p>Maximize your productivity</p>
+                    <button class="plan-btn">Upgrade to Pro</button>
+                    <ul class="plan-features">
+                        <li><i class="fa-solid fa-microchip"></i> Access to GPT-5-preview</li>
+                        <li><i class="fa-solid fa-infinity"></i> Unlimited generation</li>
+                        <li><i class="fa-solid fa-shield-halved"></i> Enterprise security</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header-nav">
+                <h2>Settings</h2>
+                <button class="close-modal-btn" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="settings-content">
+                <div class="settings-item">
+                    <span>Theme</span>
+                    <select class="settings-select">
+                        <option>Dark Purple (Default)</option>
+                        <option>Midnight Blue</option>
+                        <option>OLED Black</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <span>Response Speed</span>
+                    <select class="settings-select">
+                        <option>Balanced</option>
+                        <option>Fast</option>
+                        <option>Accurate</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <span>Clear Data</span>
+                    <button class="btn-danger" onclick="clearAppData()">Reset System</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help / Bug Report Modal -->
+    <div id="helpModal" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header-nav" style="border:none;">
+                <h2>What happened?</h2>
+                <button class="close-modal-btn" onclick="closeHelpModal()">&times;</button>
+            </div>
+            <div class="help-content">
+                <textarea id="bugReportText" placeholder="Tell us about the issue you encountered" rows="6"
+                    class="help-textarea"></textarea>
+                <div class="char-count">0 / 2000 characters used</div>
+                <p class="help-fineprint">Any information you share may be reviewed to help improve GPT Mini. If you
+                    have additional questions, <a href="#">contact support</a>.</p>
+                <div class="help-options">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="includeScreenshot">
+                        <span class="slider-round"></span>
+                        <span style="font-size:13px; color:var(--text-secondary);">Include screenshot in report</span>
+                    </label>
+                </div>
+                <div class="help-footer">
+                    <button class="send-report-btn" onclick="submitBugReport()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>

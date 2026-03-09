@@ -1,0 +1,24 @@
+numpy
+transformers
+accelerate
+torch
+sentencepiece
+requests
+tiktoken
+
+# packages for fineweb
+fastapi
+uvicorn
+pydantic
+
+# RAG Demo dependencies
+sentence-transformers
+faiss-cpu
+
+# Database & Authentication
+sqlalchemy
+passlib[bcrypt]
+python-multipart
+authlib
+httpx
+python-dotenv

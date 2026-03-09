@@ -1,0 +1,63 @@
+# Let's Build: GPT Mini Studio Workflow
+
+This document explains the step-by-step process of how this project was built, along with code snippets and explanations. This guide is designed to help you explain the architecture to others!
+
+## 1. Environment Setup
+First, we created an isolated Python virtual environment to manage dependencies without affecting the global system, and installed PyTorch, FastAPI, and other libraries.
+Snippet (`run.sh` / terminal):
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt fastapi uvicorn pydantic
+```
+
+## 2. The Model Architecture
+We utilized a custom, from-scratch implementation of the GPT-2 architecture. 
+File: `train_gpt2.py`
+Snippet:
+```python
+class GPT(nn.Module):
+    def __init__(self, config):
+        # Initializes the Transformer model with Word Token Embeddings, 
+        # Position Embeddings, and the multi-head attention blocks.
+```
+This file is capable of training the model using CUDA/MPS conditionally, but for this project, we primarily use it to load pre-trained weights to demonstrate inference.
+
+## 3. The Inference Interface API
+We created a dedicated file to handle loading the model safely and generating text autoregressively.
+File: `inference.py`
+Snippet:
+```python
+def generate_text(request: GenerateRequest) -> GenerateResponse:
+    # 1. Encodes the user prompt into tokens
+    # 2. Passes tokens to the model to get logits
+    # 3. Applies temperature and top_k sampling
+    # 4. Decodes the generated tokens back into text
+```
+
+## 4. The Web Server (FastAPI)
+We built a modern, fast backend server to host the HTML files and provide a `/api/generate` endpoint for the frontend to communicate with the Python model.
+File: `app.py`
+Snippet:
+```python
+@app.post("/api/generate")
+async def generate(request: GenerateRequest):
+    # Receives the prompt from the UI, passes it to inference.py, 
+    # and returns the generated text safely.
+```
+
+## 5. The Frontend UI
+We built a stunning, responsive, dark-mode UI using HTML, CSS, and Vanilla JavaScript.
+Files: 
+- `static/index.html` (Structure)
+- `static/style.css` (Glassmorphism & premium UI styling)
+- `static/script.js` (API communication and dynamic chat animations)
+
+---
+### Connect with the Creator:
+- X: https://x.com/job_update_2k25
+- YouTube: https://youtube.com/@buildwithomkarg
+- LinkedIn: https://linkedin.com/in/omkar-gutal-a25935249
+- GitHub: https://github.com/omkargutal
+
+© 2024 Omkar Gutal. All Rights Reserved.
