@@ -28,9 +28,9 @@ from typing import Optional
 import os
 import datetime
 
-from database import get_db, engine
-import models
-from inference import GenerateRequest, generate_text, load_model
+from core.database import get_db, engine
+from core import models
+from core.inference import GenerateRequest, generate_text, load_model
 
 # Initialize tables
 models.Base.metadata.create_all(bind=engine)
@@ -93,12 +93,17 @@ async def oauth_login(provider: str, request: Request):
     if not os.getenv(f"{provider.upper()}_CLIENT_ID"):
         return HTMLResponse(f"<h3>{provider.capitalize()} OAuth not configured. Please add Client ID and Secret to .env</h3>")
     
-    # Get current port from request
-    port = request.url.port
-    host = request.url.hostname
-    scheme = request.url.scheme
-    
-    redirect_uri = f"{scheme}://{host}:{port}/api/auth/callback/{provider}"
+    # Use BASE_URL from .env if available, otherwise reconstruct from request
+    base_url = os.getenv("BASE_URL")
+    if not base_url:
+        scheme = request.url.scheme
+        host = request.url.hostname
+        port = request.url.port
+        base_url = f"{scheme}://{host}"
+        if port:
+            base_url += f":{port}"
+            
+    redirect_uri = f"{base_url}/api/auth/callback/{provider}"
     return await oauth.create_client(provider).authorize_redirect(request, redirect_uri)
 
 @app.get("/api/auth/callback/{provider}")
@@ -176,7 +181,8 @@ async def receive_feedback(request: FeedbackRequest):
     feedback_log = f"[{datetime.datetime.now()}] FROM: {request.user_email} | MSG: {request.message} | SCREENSHOT: {request.include_screenshot}\n"
     print(f"FEEDBACK RECEIVED: {feedback_log}")
     
-    with open("feedback.log", "a") as f:
+    os.makedirs("logs", exist_ok=True)
+    with open("logs/feedback.log", "a") as f:
         f.write(feedback_log)
         
     # LOGIC: Sharing feedback to omkargutal10@gmail.com

@@ -5,6 +5,7 @@ torch
 sentencepiece
 requests
 tiktoken
+itsdangerous
 
 # packages for fineweb
 fastapi

@@ -6,10 +6,13 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base
+from core.models import Base
 
-# Using SQLite for local development, storing data in "app.db"
-SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"
+# Using SQLite for local development, storing data in "data/app.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./data/app.db"
+
+import os
+os.makedirs("data", exist_ok=True)
 
 # Setting "check_same_thread": False is required for SQLite and FastAPI concurrent connections
 engine = create_engine(

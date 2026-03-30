@@ -1,0 +1,37 @@
+# ==========================================
+# GPT Mini Studio — .gitignore
+# ==========================================
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Databases (stored in data/)
+data/
+*.db
+*.sqlite3
+
+# Environment variables — never commit .env, only .env.example
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
