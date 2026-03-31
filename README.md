@@ -8,9 +8,9 @@
 
 ### ** Personalized GPT Mini Studio**
 
-![Input Screen Preview](Output Preview/Collage  Preview/Input Screen.jpg)
+![Input Screen Preview](Output%20Preview/Collage%20%20Preview/Input%20Screen.jpg)
 ---
-![Output Screen Preview](Output Preview/Collage  Preview/Output Screen.jpg)
+![Output Screen Preview](Output%20Preview/Collage%20%20Preview/Output%20Screen.jpg)
 
 ---
 
